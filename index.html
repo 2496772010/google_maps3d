@@ -88,6 +88,7 @@
         <p><strong>Address:</strong> <span id="address-detail"></span></p>
         <p><strong>Latitude:</strong> <span id="latitude"></span></p>
         <p><strong>Longitude:</strong> <span id="longitude"></span></p>
+        <p><strong>distance:</strong> <span id="distance"></span></p>
     </div>
     <div id="map-container"></div>
     <div id="street-view-container"></div>
@@ -131,13 +132,25 @@
                     range: 1000,
                     tilt: 60,
                 });
+                console.log(map3DElement)
 
                 document.getElementById('map-container').append(map3DElement);
-                map3DElement.addEventListener('gmp-click', (event) => {
-                    console.log(event.position);
-                    // Do something with event.position.
+                // 更新街景视图
+                const streetView = new google.maps.StreetViewPanorama(
+                    document.getElementById('street-view-container'), {
+                    position: { lat:userPosition.lat, lng:userPosition.lng },
+                    pov: {
+                        heading: 34,
+                        pitch: 10
+                    },
+                    zoom: 1
                 });
-
+                console.log(streetView)
+                map3DElement.addEventListener('gmp-click', (event) => {
+                            console.log(event);
+                            // Do something with event.position.
+                            streetView.setPosition(event.position)
+                        });
                 const input = document.getElementById('address-input');
                 const autocomplete = new Autocomplete(input);
 
@@ -164,37 +177,22 @@
                         // 计算距离
                         const distance = calculateDistance(userPosition.lat, userPosition.lng, lat, lng).toFixed(2);
 
-                        // 更新街景视图
-                        const streetView = new google.maps.StreetViewPanorama(
-                            document.getElementById('street-view-container'), {
-                            position: { lat, lng },
-                            pov: {
-                                heading: 34,
-                                pitch: 10
-                            },
-                            zoom: 1
-                        });
 
+                       
                         // 显示信息窗口
                         const infoWindow = document.getElementById('info-window');
                         infoWindow.style.display = 'block';
                         document.getElementById('address-detail').innerText = address;
                         document.getElementById('latitude').innerText = lat.toFixed(6);
                         document.getElementById('longitude').innerText = lng.toFixed(6);
-
-                        // 添加导航路线
-                        const directionsService = new google.maps.DirectionsService();
-
-                        directionsService.route({
-                            origin: userPosition,
-                            destination: { lat, lng },
-                            travelMode: 'DRIVING'
-                        }, (response, status) => {
-                            if (status === 'OK') {
-                            } else {
-                                console.error('Directions request failed due to ' + status);
-                            }
+                        document.getElementById('distance').innerText = distance+"km";
+                        const pop = new google.maps.InfoWindow({
+                            content: infoWindow
                         });
+                        pop.open({
+                                anchor: markerWithScale,
+                                map3DElement,
+                            });
                     }
                 });
 
