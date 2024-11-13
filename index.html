@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>3D Maps with Street View</title>
+    <style>
+        html,
+        body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
+        #map-container {
+            height: 100%;
+            width: 70%;
+            float: left;
+        }
+
+        #street-view-container {
+            height: 100%;
+            width: 30%;
+            float: left;
+        }
+
+        #search-box {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            z-index: 1;
+            display: flex;
+            align-items: center;
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 25px;
+            padding: 5px 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        #address-input {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            outline: none;
+            font-size: 16px;
+            border-radius: 20px;
+            background-color: transparent;
+        }
+
+        #search-button {
+            background-color: transparent;
+            border: none;
+            padding: 10px;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+
+        #search-button i {
+            font-size: 20px;
+            color: #333;
+        }
+
+        #search-button:hover {
+            color: #007bff;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="search-box">
+        <input id="address-input" type="text" placeholder="Enter an address" />
+        <button id="search-button"><i class="fas fa-search"></i></button>
+    </div>
+    <div id="map-container"></div>
+    <div id="street-view-container"></div>
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCIDtLk1Z5XvyoBBgatUfVqMDqocaLrcW8&v=alpha&libraries=maps3d,maps,places"></script>
+    <!-- <script>
+        (g => { var h, a, k, p = "The Google Maps JavaScript API", c = "google", l = "importLibrary", q = "__ib__", m = document, b = window; b = b[c] || (b[c] = {}); var d = b.maps || (b.maps = {}), r = new Set, e = new URLSearchParams, u = () => h || (h = new Promise(async (f, n) => { await (a = m.createElement("script")); e.set("libraries", [...r] + ""); for (k in g) e.set(k.replace(/[A-Z]/g, t => "_" + t[0].toLowerCase()), g[k]); e.set("callback", c + ".maps." + q); a.src = `https://maps.${c}apis.com/maps/api/js?` + e; d[q] = f; a.onerror = () => h = n(Error(p + " could not load.")); a.nonce = m.querySelector("script[nonce]")?.nonce || ""; m.head.append(a) })); d[l] ? console.warn(p + " only loads once. Ignoring:", g) : d[l] = (f, ...n) => r.add(f) && u().then(() => d[l](f, ...n)) })({
+            key: "AIzaSyCIDtLk1Z5XvyoBBgatUfVqMDqocaLrcW8",
+            v: "alpha",
+            // Use the 'v' parameter to indicate the version to use (weekly, beta, alpha, etc.).
+            // Add other bootstrap parameters as needed, using camel case.
+        });
+    </script> -->
+
+    <script>
+        async function init() {
+            const { Map3DElement, Marker3DElement } = google.maps.maps3d
+            const { Autocomplete } = google.maps.places;
+            const { PinElement } = google.maps
+            let userPosition = null;
+
+            
+
+            }).catch((error) => {
+                console.error(error);
+            });
+
+
+        }
+        init()
+    </script>
+</body>
+
+</html>
