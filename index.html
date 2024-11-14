@@ -94,6 +94,11 @@
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             cursor: pointer;
         }
+        #userLocation{
+            color: #007bff;
+            cursor: pointer;
+            text-decoration: underline #007bff;
+        }
     </style>
 </head>
 
@@ -103,6 +108,7 @@
         <button id="search-button"><i class="fas fa-search"></i></button>
     </div>
     <div id="info-window">
+        <div id="userLocation"><p><strong >Hongkong jiulong<strong></p></div>
         <p><strong>Address:</strong> <span id="address-detail"></span></p>
         <p><strong>Latitude:</strong> <span id="latitude"></span></p>
         <p><strong>Longitude:</strong> <span id="longitude"></span></p>
@@ -118,6 +124,17 @@
         src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCIDtLk1Z5XvyoBBgatUfVqMDqocaLrcW8&v=alpha&libraries=maps3d,maps,places"></script>
 
     <script>
+        // 计算两点之间的距离
+        function calculateDistance(lat1, lon1, lat2, lon2) {
+            const R = 6371; // 地球半径，单位为公里
+            const dLat = (lat2 - lat1) * Math.PI / 180;
+            const dLon = (lon2 - lon1) * Math.PI / 180;
+            const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                Math.sin(dLon / 2) * Math.sin(dLon / 2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+            return R * c; // 返回距离，单位为公里
+        }
         async function init() {
             const { Map3DElement, Marker3DElement } = google.maps.maps3d;
             const { Autocomplete } = google.maps.places;
@@ -131,18 +148,6 @@
                         () => reject(new Error("Unable to get user position"))
                     );
                 });
-            }
-
-            // 计算两点之间的距离
-            function calculateDistance(lat1, lon1, lat2, lon2) {
-                const R = 6371; // 地球半径，单位为公里
-                const dLat = (lat2 - lat1) * Math.PI / 180;
-                const dLon = (lon2 - lon1) * Math.PI / 180;
-                const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-                    Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
-                    Math.sin(dLon / 2) * Math.sin(dLon / 2);
-                const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-                return R * c; // 返回距离，单位为公里
             }
             let markerPan = null
             getUserPosition().then((position) => {
@@ -280,7 +285,13 @@
                         infoWindow.style.display = 'none';
                     }
                 });
-
+                //添加事件来控制用户自定义的位置跳转
+                document.getElementById('userLocation').addEventListener('click', () => {
+                    const userLngLat = { lng: 114.196566, lat: 22.327309 }
+                    map3DElement.center = { lat: userLngLat.lat, lng: userLngLat.lng ,altitude:400}
+                    streetView.setPosition(  userLngLat)
+                    if (markerPan) markerPan.position = userLngLat
+                })
             }).catch((error) => {
                 console.error(error);
             });
