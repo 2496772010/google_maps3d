@@ -287,8 +287,9 @@
                 });
                 //添加事件来控制用户自定义的位置跳转
                 document.getElementById('userLocation').addEventListener('click', () => {
-                    const userLngLat = { lng: 114.196566, lat: 22.327309 }
+                    const userLngLat = { lng: 114.196043, lat: 22.334355 }
                     map3DElement.center = { lat: userLngLat.lat, lng: userLngLat.lng ,altitude:400}
+                    console.log(streetView)
                     streetView.setPosition(  userLngLat)
                     if (markerPan) markerPan.position = userLngLat
                 })
