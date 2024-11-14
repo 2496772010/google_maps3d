@@ -67,14 +67,32 @@
         #info-window {
             position: absolute;
             top: 80px;
-            right: 20px;
+            right: 10px;
             z-index: 2;
             background-color: white;
             border: 1px solid #ddd;
             border-radius: 10px;
             padding: 10px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            display: block;
+            display: none;
+        }
+
+        #advertisement {
+            width: 100%;
+            height: 200px;
+        }
+
+        #toggle-info-window {
+            position: absolute;
+            top: 52px;
+            right: 10px;
+            z-index: 3;
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            padding: 5px 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
         }
     </style>
 </head>
@@ -89,9 +107,11 @@
         <p><strong>Latitude:</strong> <span id="latitude"></span></p>
         <p><strong>Longitude:</strong> <span id="longitude"></span></p>
         <p><strong>distance:</strong> <span id="distance"></span></p>
+        <div id="advertisement"></div>
     </div>
     <div id="map-container"></div>
     <div id="street-view-container"></div>
+    <button id="toggle-info-window">Toggle Info Window</button>
     <!-- Font Awesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <script
@@ -124,7 +144,7 @@
                 const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
                 return R * c; // 返回距离，单位为公里
             }
-
+            let markerPan = null
             getUserPosition().then((position) => {
                 userPosition = position;
                 const map3DElement = new Map3DElement({
@@ -132,6 +152,26 @@
                     range: 1000,
                     tilt: 60,
                 });
+                if (markerPan == null) {
+                    const parser = new DOMParser();
+
+                    // A marker with a custom inline SVG.
+                    const pinSvgString = '<svg t="1731546655960" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="8738" width="64" height="64"><path d="M403.911111 267.377778C335.644444 267.377778 284.444444 324.266667 284.444444 386.844444v278.755556c0 22.755556 17.066667 45.511111 45.511112 45.511111s45.511111-22.755556 45.511111-45.511111V455.111111c0-5.688889 5.688889-11.377778 11.377777-11.377778s5.688889 5.688889 5.688889 11.377778v506.311111c0 34.133333 17.066667 62.577778 51.2 62.577778 34.133333 0 56.888889-28.444444 56.888889-62.577778v-284.444444c0-5.688889 5.688889-11.377778 11.377778-11.377778s11.377778 5.688889 11.377778 11.377778V967.111111c5.688889 28.444444 28.444444 51.2 56.888889 51.2 34.133333 0 51.2-22.755556 51.2-62.577778V460.8c0-5.688889 5.688889-11.377778 11.377777-11.377778s11.377778 5.688889 11.377778 11.377778v210.488889c0 22.755556 17.066667 45.511111 45.511111 45.511111s39.822222-22.755556 39.822223-51.2V386.844444c0-68.266667-51.2-125.155556-119.466667-125.155555l-216.177778 5.688889zM512 0C443.733333 0 392.533333 56.888889 392.533333 125.155556c0 68.266667 51.2 125.155556 119.466667 125.155555 68.266667 0 119.466667-56.888889 119.466667-125.155555C631.466667 56.888889 580.266667 0 512 0z" fill="#F3C900" p-id="8739"></path></svg>'
+
+                    const pinSvg =
+                        parser.parseFromString(pinSvgString, 'image/svg+xml').documentElement;
+
+                    markerPan = new Marker3DElement({
+                        position: position,
+                    });
+                    const templateForSvg = document.createElement('template');
+                    templateForSvg.content.append(pinSvg);
+                    markerPan.append(templateForSvg)
+                    map3DElement.append(markerPan)
+
+                } else {
+                    markerPan.position = position
+                }
                 console.log(map3DElement)
 
                 document.getElementById('map-container').append(map3DElement);
@@ -145,10 +185,15 @@
                     },
                     zoom: 1
                 });
+                streetView.addListener("pano_changed", e => {
+                    if (markerPan) {
+                        markerPan.position = streetView.position
+                    }
+                })
                 console.log(streetView)
-                let markerPan = null
                 map3DElement.addEventListener('gmp-click', (event) => {
-
+                    const infoWindow = document.getElementById('info-window');
+                    infoWindow.style.display = 'block';
                     if (markerPan == null) {
                         const parser = new DOMParser();
 
@@ -223,6 +268,16 @@
                             content: infoWindow
                         });
                         pop.open(map3DElement, marker);
+                    }
+                });
+
+                // 添加按钮点击事件来控制info-window的显示和隐藏
+                document.getElementById('toggle-info-window').addEventListener('click', () => {
+                    const infoWindow = document.getElementById('info-window');
+                    if (infoWindow.style.display === 'none' || infoWindow.style.display === '') {
+                        infoWindow.style.display = 'block';
+                    } else {
+                        infoWindow.style.display = 'none';
                     }
                 });
 
